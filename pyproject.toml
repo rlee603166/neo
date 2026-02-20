@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "anthropic>=0.83.0",
     "langchain>=1.2.10",
     "langgraph>=1.0.9",
 ]
