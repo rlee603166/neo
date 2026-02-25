@@ -1,8 +1,7 @@
-from agent import call_llm
+from llm import call_llm
 from models import (
-    Tool, InputSchema, ToolProperty,
-    Message, UserMessage, ToolResultMessage,
-    AgentResponse, ToolCall,
+    InputSchema, Message, Tool, ToolCall, ToolProperty,
+    ToolResultMessage, UserMessage,
 )
 
 SYSTEM = "You are a helpful assistant."
@@ -18,7 +17,7 @@ get_weather = Tool(
     ),
 )
 
-# Fake tool execution
+
 def execute_tool(tool_call: ToolCall) -> str:
     if tool_call.name == "get_weather":
         city = tool_call.input.get("city", "unknown")
@@ -29,7 +28,7 @@ def execute_tool(tool_call: ToolCall) -> str:
 def test_plain():
     print("=== Plain text ===")
     messages = [UserMessage("What is the capital of France?")]
-    response = AgentResponse.from_message(call_llm(messages, system=SYSTEM))
+    response = call_llm(messages, system=SYSTEM)
     print(response.text)
 
 
@@ -37,10 +36,7 @@ def test_tool_use():
     print("\n=== Tool use ===")
     messages = [UserMessage("What is the weather in Tokyo?")]
 
-    # First call — LLM should request the tool
-    response = AgentResponse.from_message(
-        call_llm(messages, system=SYSTEM, tools=[get_weather])
-    )
+    response = call_llm(messages, system=SYSTEM, tools=[get_weather])
     print(f"stop_reason: {response.stop_reason}")
 
     if response.has_tool_calls:
@@ -49,16 +45,12 @@ def test_tool_use():
             result = execute_tool(tool_call)
             print(f"Tool result: {result}")
 
-            # Append assistant turn (with tool use blocks) and tool result
             messages.append(Message(role="assistant", content=[
                 {"type": "tool_use", "id": tool_call.id, "name": tool_call.name, "input": tool_call.input}
             ]))
             messages.append(ToolResultMessage(tool_call.id, result))
 
-        # Second call — LLM produces final answer
-        final = AgentResponse.from_message(
-            call_llm(messages, system=SYSTEM, tools=[get_weather])
-        )
+        final = call_llm(messages, system=SYSTEM, tools=[get_weather])
         print(f"Final answer: {final.text}")
 
 
