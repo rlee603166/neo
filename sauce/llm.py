@@ -1,6 +1,6 @@
 import anthropic
 
-from models import AgentResponse, Message, Tool
+from sauce.models import AgentResponse, Message, Tool
 
 client = anthropic.Anthropic()
 async_client = anthropic.AsyncAnthropic()

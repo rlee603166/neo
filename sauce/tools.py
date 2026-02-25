@@ -1,7 +1,7 @@
 import os
 import subprocess
 import hashlib
-from models import InputSchema, Tool, ToolProperty
+from sauce.models import InputSchema, Tool, ToolProperty
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────

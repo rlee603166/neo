@@ -3,33 +3,35 @@ import re
 import uuid
 import asyncio
 
-import llm
-import tools as tool_defs
-from models import Conversation, Message, ToolCall, UserMessage
-from node import Node, NodeType, NodeState, NODE_CONFIG, TOOLS_FOR_NODE
-from tree import DecompositionTree
+import sauce.llm as llm
+import sauce.tools as tool_defs
+from sauce.models import Conversation, Message, ToolCall, UserMessage
+from sauce.node import Node, NodeType, NodeState, NODE_CONFIG, TOOLS_FOR_NODE
+from sauce.tree import DecompositionTree
 
 
 class Neo:
-    def __init__(self, tree: DecompositionTree, max_concurrent_tasks: int = 10):
+    def __init__(self, tree: DecompositionTree, max_concurrent_tasks: int = 10, env_directory: str = "."):
         self.tree = tree
         self.sem = asyncio.Semaphore(max_concurrent_tasks)
         self.pending: set[asyncio.Task] = set()
+        self.env_directory = os.path.abspath(env_directory)
 
-    def prompt(self, prompt: str, working_directory: str = ".") -> Node:
-        prompt_with_context = f"[Working Directory: {working_directory}]\n\n{prompt}"
+    def prompt(self, prompt: str) -> Node:
+        prompt_with_context = f"[Working Directory: {self.env_directory}]\n\n{prompt}"
 
         root = Node(
             node_id=self.generate_id(),
             tool_id="",
             node_type=NodeType.THINKING,
+            state=NodeState.RUNNING,
             conversation=Conversation(
                 system=NODE_CONFIG[NodeType.THINKING].system_prompt,
                 messages=[UserMessage(prompt_with_context)],
             ),
             parent_id="ROOT",
             children_ids=[],
-            working_directory=working_directory,
+            working_directory=".",  # Always "." relative to env_directory
         )
         self.tree.add_node(root)
         self.tree.root.children_ids.append(root.node_id)
@@ -99,7 +101,7 @@ class Neo:
 
     def execute_tools(self, caller: Node, tool_calls: list[ToolCall]) -> list[Node]:
         subagents = []
-        regular_tools = []
+        caller.active_tool_calls.clear()
 
         for tc in tool_calls:
             if tc.name == "spawn_subagent":
@@ -107,12 +109,11 @@ class Neo:
                 if node:
                     subagents.append(node)
             else:
-                regular_tools.append(tc)
-                result = tool_defs.TOOL_REGISTRY[tc.name](tc.input, self.tree, caller.node_id, caller.working_directory)
+                caller.tool_calls.append(tc)
+                caller.active_tool_calls.append(tc)
+                absolute_working_dir = os.path.join(self.env_directory, caller.working_directory)
+                result = tool_defs.TOOL_REGISTRY[tc.name](tc.input, self.tree, caller.node_id, absolute_working_dir)
                 caller.conversation.add_tool_result(tc.id, result)
-
-        if regular_tools:
-            caller.tool_calls.extend(regular_tools)
 
         return subagents
 
@@ -126,22 +127,26 @@ class Neo:
 
         requested_dir = tool_call.input.get("working_directory")
 
+        # Calculate relative working_dir (what the agent sees)
         if requested_dir is None:
             working_dir = parent.working_directory
         elif os.path.isabs(requested_dir):
-            working_dir = requested_dir
+            # If absolute, treat as relative to env root
+            working_dir = requested_dir.lstrip("/")
         else:
             working_dir = os.path.join(parent.working_directory, requested_dir)
 
+        # Create the directory with env_directory prepended
+        absolute_dir = os.path.join(self.env_directory, working_dir)
         try:
-            os.makedirs(working_dir, exist_ok=True)
+            os.makedirs(absolute_dir, exist_ok=True)
         except Exception as e:
             error = f"Error: Could not create directory '{working_dir}': {e}"
             parent.conversation.add_tool_result(tool_call.id, error)
             return None
 
         node_type = NodeType(requested)
-        task_with_context = f"[Working Directory: {working_dir}]\n\n{tool_call.input['task']}"
+        task_with_context = f"[Working Directory: {absolute_dir}]\n\n{tool_call.input['task']}"
 
         return Node(
             node_id=self.generate_id(),

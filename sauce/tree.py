@@ -1,7 +1,7 @@
 import json
 
-from models import Conversation
-from node import Node, NodeType, NodeState
+from sauce.models import Conversation
+from sauce.node import Node, NodeType, NodeState
 
 
 class DecompositionTree:
@@ -10,7 +10,7 @@ class DecompositionTree:
             node_id="ROOT",
             node_type=NodeType.THINKING,
             conversation=Conversation(),
-            state=NodeState.COMPLETED,
+            state=NodeState.RUNNING,
         )
         self.nodes: dict[str, Node] = {}
 
@@ -49,6 +49,7 @@ class DecompositionTree:
 
     def dump_state(self, path: str | None = None) -> dict:
         """Serialize the full tree to a dict. Optionally writes to a JSON file at `path`."""
+        self.root.state = NodeState.COMPLETED
         state = {
             "root": self.root.to_dict(),
             "nodes": {node_id: node.to_dict() for node_id, node in self.nodes.items()},

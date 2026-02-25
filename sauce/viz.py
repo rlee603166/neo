@@ -9,7 +9,9 @@ from rich.tree import Tree
 from rich.console import Console
 from rich.text import Text
 
-from agent import DecompositionTree, Neo, Node, NodeState
+from sauce.neo import Neo
+from sauce.tree import DecompositionTree
+from sauce.node import Node, NodeState
 
 
 # ── Terminal UI Rendering ────────────────────────────────────────────────────
@@ -31,7 +33,7 @@ def _add_children(parent_tree: Tree, parent_node: Node, decomp_tree: Decompositi
         _add_children(child_tree, child_node, decomp_tree)
 
     # Also show active tool calls as temporary branches
-    for tool_call in parent_node.tool_calls:
+    for tool_call in parent_node.active_tool_calls:
         tool_text = Text()
         tool_text.append("🔧 ", style="yellow")
         tool_text.append(f"{tool_call.name}", style="cyan")
@@ -99,7 +101,7 @@ async def run_with_live_visualization(
     Run Neo with live visualization.
 
     Args:
-        neo: Neo instance with initialized tree
+        neo: Neo instance with initialized tree (env_directory set at initialization)
         task: Task to prompt Neo with
         title: Title for the visualization
         refresh_rate: Refresh rate in Hz (default 4)

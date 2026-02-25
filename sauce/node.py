@@ -2,9 +2,9 @@ import json
 from enum import Enum
 from dataclasses import dataclass, field
 
-import prompts
-import tools as tool_defs
-from models import Conversation, Message, ToolCall, UserMessage
+import sauce.prompts as prompts
+import sauce.tools as tool_defs
+from sauce.models import Conversation, Message, ToolCall, UserMessage
 
 
 class NodeType(Enum):
@@ -54,8 +54,10 @@ class Node:
     children_ids: list[str] = field(default_factory=list)
     active_children: set = field(default_factory=set)
 
-    for_vis: list[str] = field(default_factory=list)
     tool_calls: list[ToolCall] = field(default_factory=list)
+
+    for_vis: list[str] = field(default_factory=list)
+    active_tool_calls: list[ToolCall] = field(default_factory=list)
 
     # Track file versions for optimistic concurrency control
     file_versions: dict[str, str] = field(default_factory=dict)
@@ -76,6 +78,7 @@ class Node:
             "tool_calls": [{"id": tc.id, "name": tc.name, "input": tc.input} for tc in self.tool_calls],
             "file_versions": self.file_versions,
             "working_directory": self.working_directory,
+            "active_tool_calls": [{"id": tc.id, "name": tc.name, "input": tc.input} for tc in self.active_tool_calls],
             "conversation": {
                 "system": self.conversation.system,
                 "messages": self.conversation.to_list(),
@@ -97,6 +100,7 @@ class Node:
             state=NodeState(data["state"]),
             children_ids=data.get("children_ids", []),
             active_children=set(data.get("active_children", [])),
+            active_tool_calls=[ToolCall(**tc) for tc in data.get("active_tool_calls", [])],
             for_vis=data.get("for_vis", []),
             tool_calls=[ToolCall(**tc) for tc in data.get("tool_calls", [])],
             file_versions=data.get("file_versions", {}),

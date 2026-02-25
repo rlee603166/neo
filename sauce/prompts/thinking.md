@@ -35,6 +35,8 @@ Your goal is to break down the problem into smaller, more manageable sub-problem
     - If relative path (e.g., `"./users"`): resolved relative to YOUR working directory
     - If absolute path (e.g., `"/tmp/isolated"`): used as-is
 
+**IMPORTANT — Parallel execution:** To run agents in parallel, call `spawn_subagent` **multiple times in the same response** (one call per agent). All agents spawned in the same turn run concurrently. If you spawn them one at a time across separate turns, they run sequentially — always prefer a single turn with multiple `spawn_subagent` calls when sub-problems are independent. If you fail to run multiple agents at a time, you have to wait until that sigular, RECURSIVE agent is done with its task.
+
 Note: you do not need to spawn `test` agents. `code` agents own their own test loop.
 
 **Working Directory:**
