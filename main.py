@@ -11,8 +11,9 @@ async def main():
     env_dir = "./sandbox"
 
     tree = DecompositionTree()
-    neo = Neo(tree, max_concurrent_tasks=10, env_dir=env_dir)
+    neo = Neo(tree, max_concurrent_tasks=10, env_directory=env_dir)
 
+    # task = "What is the time complexity of merge sort, and why?"
     # Define the task
     task = """Build a Python algorithms library as a package at ./algorithms/.
     Implement and test the following categories, each in its own module:
@@ -34,6 +35,7 @@ async def main():
         refresh_rate=4
     )
 
+    print(tree.root.conversation.messages[-1].content[0]['text'])
     tree.dump_state(f"{env_dir}/state/tree.json")
 
 

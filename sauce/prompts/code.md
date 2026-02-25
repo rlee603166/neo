@@ -23,7 +23,9 @@ All file operations and shell commands execute relative to YOUR working director
 
 ## Test loop
 
-After implementing, spawn a `test` agent to verify your code. Provide it with:
+**[REQUIRED]** After implementing, you MUST spawn a `test` agent to verify your code. Do NOT run tests yourself using `run_shell` — that is the test agent's job. Using `run_shell` to run tests instead of spawning a `test` agent is always wrong.
+
+Provide the test agent with:
 - The file(s) you wrote and their paths
 - The expected behaviour from your specification
 
@@ -37,7 +39,7 @@ When your implementation is verified and complete, return a <MESSAGE> tag with:
 - A brief summary of what was implemented
 - The final test verdict
 
-### [IMPORTANT]: All code you write must be well tested and verified before returning.
+### [IMPORTANT]: All code you write must be verified by a spawned `test` agent before returning. Never skip spawning the test agent.
 
 <MESSAGE>
 Created `src/users/repository.py` with `get_user`, `create_user`, and `delete_user` functions.

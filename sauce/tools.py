@@ -95,6 +95,9 @@ def _read_file(path: str, tree=None, node_id: str = None, working_directory: str
 
 def _write_file(path: str, content: str, tree=None, node_id: str = None, working_directory: str = ".") -> str:
     try:
+        # Keep original path for display
+        display_path = path
+
         # Resolve path relative to working directory if it's not absolute
         if not os.path.isabs(path):
             path = os.path.join(working_directory, path)
@@ -110,7 +113,7 @@ def _write_file(path: str, content: str, tree=None, node_id: str = None, working
 
                 if current_hash != expected_hash:
                     return (
-                        f"CONFLICT: File '{path}' was modified by another agent since you read it. "
+                        f"CONFLICT: File '{display_path}' was modified by another agent since you read it. "
                         f"Please re-read the file to see the latest changes and try again."
                     )
 
@@ -126,7 +129,7 @@ def _write_file(path: str, content: str, tree=None, node_id: str = None, working
             new_hash = hashlib.sha256(content.encode()).hexdigest()
             tree.nodes[node_id].file_versions[path] = new_hash
 
-        return f"Wrote {len(content)} bytes to {path}"
+        return f"Wrote {len(content)} bytes to {display_path}"
     except Exception as e:
         return f"Error: {e}"
 

@@ -3,6 +3,7 @@ Frontend visualization module for Neo's decomposition tree.
 Provides live terminal UI to watch the tree mechanics in real-time.
 """
 
+import os
 import asyncio
 from rich.live import Live
 from rich.tree import Tree
@@ -35,7 +36,7 @@ def _add_children(parent_tree: Tree, parent_node: Node, decomp_tree: Decompositi
     # Also show active tool calls as temporary branches
     for tool_call in parent_node.active_tool_calls:
         tool_text = Text()
-        tool_text.append("🔧 ", style="yellow")
+        tool_text.append("[TOOL]: ", style="yellow")
         tool_text.append(f"{tool_call.name}", style="cyan")
         tool_text.append(f"({_format_tool_input(tool_call.input)})", style="dim")
         parent_tree.add(tool_text)
@@ -67,12 +68,16 @@ def format_node(node: Node) -> Text:
     }
     color = color_map.get(node.state, "white")
 
-    # Format: [STATE] TYPE (node_id) | msgs: N
+    # Format: [STATE] TYPE (node_id) | msgs: N | cwd: path
     text = Text()
-    text.append(f"[{node.state.value.upper()}] ", style=f"bold {color}")
-    text.append(f"{node.node_type.value} ", style="cyan")
+    text.append(f"({node.state.value.lower()}) ", style=f"bold bright_{color}")
+    text.append(f"{node.node_type.value.upper()} AGENT", style="bright_magenta")
     text.append(f"({node.node_id[:8]}...) ", style="dim")
     text.append(f"| msgs: {len(node.conversation.messages)}", style="dim")
+
+    # Show working directory if not root
+    if hasattr(node, 'working_directory') and node.working_directory and node.working_directory != ".":
+        text.append(f" | cwd: {node.working_directory}", style="dim italic")
 
     # Show active children count if any
     if node.active_children:

@@ -18,25 +18,23 @@ class Neo:
         self.env_directory = os.path.abspath(env_directory)
 
     def prompt(self, prompt: str) -> Node:
-        prompt_with_context = f"[Working Directory: {self.env_directory}]\n\n{prompt}"
+        prompt_with_context = f"[Working Directory: .]\n\n{prompt}"
 
         root = Node(
             node_id=self.generate_id(),
             tool_id="",
             node_type=NodeType.THINKING,
-            state=NodeState.RUNNING,
+            state=NodeState.READY,
             conversation=Conversation(
                 system=NODE_CONFIG[NodeType.THINKING].system_prompt,
                 messages=[UserMessage(prompt_with_context)],
             ),
-            parent_id="ROOT",
             children_ids=[],
             working_directory=".",  # Always "." relative to env_directory
         )
-        self.tree.add_node(root)
-        self.tree.root.children_ids.append(root.node_id)
-        self.tree.root.active_children.add(root.node_id)
-        self.tree.root.for_vis.append(root.node_id)
+
+        self.tree.set_root(root)
+        self.schedule_ready()
 
         return root
 
@@ -146,7 +144,7 @@ class Neo:
             return None
 
         node_type = NodeType(requested)
-        task_with_context = f"[Working Directory: {absolute_dir}]\n\n{tool_call.input['task']}"
+        task_with_context = f"[Working Directory: {working_dir}]\n\n{tool_call.input['task']}"
 
         return Node(
             node_id=self.generate_id(),

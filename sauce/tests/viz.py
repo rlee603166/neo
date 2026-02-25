@@ -7,9 +7,9 @@ import asyncio
 from unittest.mock import patch
 from rich.console import Console
 
-from agent import DecompositionTree, Neo
-from models import AgentResponse, ToolCall
-from viz import run_with_live_visualization
+from sauce.neo import DecompositionTree, Neo
+from sauce.models import AgentResponse, ToolCall
+from sauce.viz import run_with_live_visualization
 
 
 # ── Mock LLM Infrastructure ───────────────────────────────────────────────────
@@ -183,15 +183,15 @@ async def main():
     console = Console()
 
     # Patch the LLM call
-    with patch('llm.call_llm_async', new=mock_call_llm_async):
+    with patch('sauce.llm.call_llm_async', new=mock_call_llm_async):
 
-        console.print("\n[bold cyan]═══ Test 1: Simple Scenario ═══[/bold cyan]\n")
-        console.print("THINKING node spawns 3 children (CODE + TEST + CODE)")
-        console.print("Each child makes sequential tool calls\n")
-        tree1 = DecompositionTree()
-        neo1 = Neo(tree1)
-        await run_with_live_visualization(neo1, SIMPLE_TASK, "Simple: THINKING → 3 children")
-        await asyncio.sleep(2)
+        # console.print("\n[bold cyan]═══ Test 1: Simple Scenario ═══[/bold cyan]\n")
+        # console.print("THINKING node spawns 3 children (CODE + TEST + CODE)")
+        # console.print("Each child makes sequential tool calls\n")
+        # tree1 = DecompositionTree()
+        # neo1 = Neo(tree1)
+        # await run_with_live_visualization(neo1, SIMPLE_TASK, "Simple: THINKING → 3 children")
+        # await asyncio.sleep(2)
 
         console.print("\n[bold cyan]═══ Test 2: Tool-Heavy Scenario ═══[/bold cyan]\n")
         console.print("CODE node making sequential tool calls without subagents\n")
