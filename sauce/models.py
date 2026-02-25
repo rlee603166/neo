@@ -60,6 +60,10 @@ class Conversation:
     def to_list(self) -> list[dict]:
         return [m.to_dict() for m in self.messages]
 
+    def from_list(self, data: list[dict]) -> "Conversation":
+        self.messages = [Message(**m) for m in data]
+        return self
+
     def __len__(self) -> int:
         return len(self.messages)
 

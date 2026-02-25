@@ -31,7 +31,7 @@ def _add_children(parent_tree: Tree, parent_node: Node, decomp_tree: Decompositi
         _add_children(child_tree, child_node, decomp_tree)
 
     # Also show active tool calls as temporary branches
-    for tool_call in parent_node.active_tools:
+    for tool_call in parent_node.tool_calls:
         tool_text = Text()
         tool_text.append("🔧 ", style="yellow")
         tool_text.append(f"{tool_call.name}", style="cyan")
