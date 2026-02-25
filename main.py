@@ -11,7 +11,7 @@ async def main():
     env_dir = "./sandbox"
 
     tree = DecompositionTree()
-    neo = Neo(tree, max_concurrent_tasks=10, env_directory=env_dir)
+    neo = Neo(tree, max_concurrent_tasks=10, env_dir=env_dir)
 
     # Define the task
     task = """Build a Python algorithms library as a package at ./algorithms/.
