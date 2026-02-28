@@ -1,0 +1,331 @@
+/* 2048 Game CSS */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #faf8ef;
+  font-family: "Clear Sans", Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #776e65;
+  margin: 0;
+}
+
+#score-board {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.score-box {
+  background: #bbada0;
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-align: center;
+  min-width: 64px;
+}
+
+.score-label {
+  display: block;
+  font-size: 0.65rem;
+  color: #eee4da;
+  font-weight: bold;
+}
+
+.score-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: white;
+}
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0;
+  width: 100%;
+  max-width: 480px;
+}
+
+#new-game-btn {
+  background: #8f7a66;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+#new-game-btn:hover {
+  background: #9f8b77;
+}
+
+.hint {
+  color: #776e65;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+#grid-container {
+  position: relative;
+  width: 480px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+#grid {
+  background: #bbada0;
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  position: relative;
+  box-sizing: border-box;
+  width: 480px;
+  height: 480px;
+}
+
+.cell {
+  background: rgba(238, 228, 218, 0.35);
+  border-radius: 6px;
+}
+
+.tile {
+  position: absolute;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 80ms ease;
+  z-index: 2;
+}
+
+/* Tile font sizes */
+.tile-2,
+.tile-4 {
+  font-size: 2.2rem;
+}
+
+.tile-8,
+.tile-16,
+.tile-32,
+.tile-64 {
+  font-size: 2rem;
+}
+
+.tile-128,
+.tile-256,
+.tile-512 {
+  font-size: 1.6rem;
+}
+
+.tile-1024,
+.tile-2048 {
+  font-size: 1.3rem;
+}
+
+.tile-super {
+  font-size: 1rem;
+}
+
+/* Tile colours */
+.tile-2 {
+  background: #eee4da;
+  color: #776e65;
+}
+
+.tile-4 {
+  background: #ede0c8;
+  color: #776e65;
+}
+
+.tile-8 {
+  background: #f2b179;
+  color: #f9f6f0;
+}
+
+.tile-16 {
+  background: #f59563;
+  color: #f9f6f0;
+}
+
+.tile-32 {
+  background: #f67c5f;
+  color: #f9f6f0;
+}
+
+.tile-64 {
+  background: #f65e3b;
+  color: #f9f6f0;
+}
+
+.tile-128 {
+  background: #edcf72;
+  color: #f9f6f0;
+}
+
+.tile-256 {
+  background: #edcc61;
+  color: #f9f6f0;
+}
+
+.tile-512 {
+  background: #edc850;
+  color: #f9f6f0;
+}
+
+.tile-1024 {
+  background: #edc53f;
+  color: #f9f6f0;
+}
+
+.tile-2048 {
+  background: #edc22e;
+  color: #f9f6f0;
+}
+
+.tile-super {
+  background: #3c3a32;
+  color: #f9f6f0;
+}
+
+/* Animations */
+@keyframes pop-in {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tile-new {
+  animation: pop-in 150ms ease forwards;
+}
+
+.tile-merged {
+  animation: bump 150ms ease forwards;
+}
+
+/* Overlay */
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(238, 228, 218, 0.73);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+#overlay.hidden {
+  display: none;
+}
+
+#overlay-message {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #776e65;
+  margin-bottom: 20px;
+}
+
+#overlay button {
+  background: #8f7a66;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+#overlay button:hover {
+  background: #9f8b77;
+}
+
+/* Responsive Design */
+@media (max-width: 520px) {
+  #grid-container,
+  #grid {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  h1 {
+    font-size: 2.8rem;
+  }
+
+  .tile-2,
+  .tile-4 {
+    font-size: 1.87rem;
+  }
+
+  .tile-8,
+  .tile-16,
+  .tile-32,
+  .tile-64 {
+    font-size: 1.7rem;
+  }
+
+  .tile-128,
+  .tile-256,
+  .tile-512 {
+    font-size: 1.36rem;
+  }
+
+  .tile-1024,
+  .tile-2048 {
+    font-size: 1.1rem;
+  }
+
+  .tile-super {
+    font-size: 0.85rem;
+  }
+}

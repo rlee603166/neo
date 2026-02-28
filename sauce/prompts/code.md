@@ -23,14 +23,24 @@ All file operations and shell commands execute relative to YOUR working director
 
 ## Test loop
 
-**[REQUIRED]** After implementing, you MUST spawn a `test` agent to verify your code. Do NOT run tests yourself using `run_shell` — that is the test agent's job. Using `run_shell` to run tests instead of spawning a `test` agent is always wrong.
+**[REQUIRED]** After implementing, you MUST spawn `test` agents to verify your code. Do NOT run tests yourself using `run_shell` — that is the test agent's job.
 
-Provide the test agent with:
-- The file(s) you wrote and their paths
-- The expected behaviour from your specification
+### Spawn parallel, focused test agents
 
-If the test agent reports failures, fix the code to match the spec and spawn another `test` agent.
-Stop after 2 fix attempts — if tests still fail, report the failures rather than looping further.
+Break your verification into **independent aspects** and spawn a separate `test` agent for each one **in a single tool call batch**. Each test agent should cover ONE specific concern.
+
+For example, if you implemented a Game class, spawn these in parallel:
+- Test agent 1: "Test Game constructor and initialization — verify board size, initial tile count, score defaults. File: game.js"
+- Test agent 2: "Test Game.move() merging logic — verify tiles merge correctly in all 4 directions. File: game.js"
+- Test agent 3: "Test Game.canMove() and game-over detection — verify it returns false only when no moves remain. File: game.js"
+
+**Rules:**
+- Spawn **2-5 test agents** depending on the complexity of what you implemented.
+- Each agent tests **one aspect** — do not ask one agent to test everything.
+- Spawn all test agents **at the same time** so they run in parallel.
+- Give each agent: the file path(s) to test, and the specific behavior to verify.
+- If a test agent reports failures, fix the code and re-spawn **only the failing test agents**.
+- Stop after 2 fix attempts — if tests still fail, report the failures rather than looping further.
 
 ## Output format
 

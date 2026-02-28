@@ -147,13 +147,18 @@ def _list_directory(path: str = ".", tree=None, node_id: str = None, working_dir
 
 def _run_shell(command: str, tree=None, node_id: str = None, working_directory: str = ".") -> str:
     try:
+        env = os.environ.copy()
+        env["CI"] = "true"
+        env["DEBIAN_FRONTEND"] = "noninteractive"
         result = subprocess.run(
             command,
             shell=True,
             capture_output=True,
+            stdin=subprocess.DEVNULL,
             text=True,
             timeout=30,
             cwd=working_directory,
+            env=env,
         )
         output = result.stdout
         if result.stderr:

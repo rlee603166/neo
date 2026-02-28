@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2048</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>2048</h1>
+    <div id="score-board">
+      <div class="score-box"><span class="score-label">SCORE</span><span id="score">0</span></div>
+      <div class="score-box"><span class="score-label">BEST</span><span id="best-score">0</span></div>
+    </div>
+  </header>
+
+  <div id="controls">
+    <button id="new-game-btn">New Game</button>
+    <p class="hint">Use arrow keys or swipe to play</p>
+  </div>
+
+  <div id="grid-container">
+    <div id="grid">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+    <div id="overlay" class="hidden">
+      <p id="overlay-message"></p>
+      <button id="try-again-btn">Try Again</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

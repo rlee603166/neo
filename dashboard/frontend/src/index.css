@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream-50:  #FDFAF4;
+  --color-cream-100: #F5EDE0;
+  --color-cream-200: #EDE1CE;
+  --color-cream-300: #DDD0BA;
+  --color-cream-400: #C4B59E;
+  --color-coral-400: #E06242;
+  --color-coral-500: #C8441D;
+  --color-coral-600: #A83618;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-cream-100);
+  color: #1C1511;
+}
+
+/* React Flow overrides */
+.react-flow__controls button {
+  background-color: var(--color-cream-50) !important;
+  border-color: var(--color-cream-300) !important;
+  color: #6B6259 !important;
+}
+.react-flow__controls button:hover {
+  background-color: var(--color-cream-200) !important;
+}
+.react-flow__minimap {
+  background-color: var(--color-cream-200) !important;
+  border: 1px solid var(--color-cream-300) !important;
+}

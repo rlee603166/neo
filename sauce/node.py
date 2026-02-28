@@ -37,7 +37,7 @@ NODE_CONFIG: dict[NodeType, NodeConfig] = {
 TOOLS_FOR_NODE: dict[NodeType, list] = {
     NodeType.THINKING:  [tool_defs.spawn_subagent, tool_defs.read_file, tool_defs.write_file, tool_defs.list_directory, tool_defs.run_shell],
     NodeType.CODE:      [tool_defs.read_file, tool_defs.write_file, tool_defs.list_directory, tool_defs.run_shell, tool_defs.spawn_subagent],
-    NodeType.TEST:      [tool_defs.read_file, tool_defs.run_shell],
+    NodeType.TEST:      [tool_defs.read_file, tool_defs.write_file, tool_defs.run_shell],
 }
 
 

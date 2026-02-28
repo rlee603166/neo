@@ -76,24 +76,24 @@ class Neo:
                 messages=node.conversation.messages,
             )
 
-            content = []
-            if result.text:
-                content.append({"type": "text", "text": result.text})
-            for tc in result.tool_calls:
-                content.append({"type": "tool_use", "id": tc.id, "name": tc.name, "input": tc.input})
-            node.conversation.add_message(Message(role="assistant", content=content))
+        content = []
+        if result.text:
+            content.append({"type": "text", "text": result.text})
+        for tc in result.tool_calls:
+            content.append({"type": "tool_use", "id": tc.id, "name": tc.name, "input": tc.input})
+        node.conversation.add_message(Message(role="assistant", content=content))
 
-            if result.stop_reason == "end_turn":
-                message = self.parse_xml_tag(result.text, NODE_CONFIG[node.node_type].message)
-                self.tree.message_parent(node, message)
-                node.state = NodeState.COMPLETED
+        if result.stop_reason == "end_turn":
+            message = self.parse_xml_tag(result.text, NODE_CONFIG[node.node_type].message)
+            self.tree.message_parent(node, message)
+            node.state = NodeState.COMPLETED
 
-            elif result.stop_reason == "tool_use":
-                subagents = self.execute_tools(node, result.tool_calls)
-                if subagents:
-                    self.tree.add_children(node, subagents)
-                else:
-                    node.state = NodeState.READY
+        elif result.stop_reason == "tool_use":
+            subagents = self.execute_tools(node, result.tool_calls)
+            if subagents:
+                self.tree.add_children(node, subagents)
+            else:
+                node.state = NodeState.READY
 
         return node
 
@@ -132,7 +132,7 @@ class Neo:
             # If absolute, treat as relative to env root
             working_dir = requested_dir.lstrip("/")
         else:
-            working_dir = os.path.join(parent.working_directory, requested_dir)
+            working_dir = os.path.normpath(os.path.join(parent.working_directory, requested_dir))
 
         # Create the directory with env_directory prepended
         absolute_dir = os.path.join(self.env_directory, working_dir)

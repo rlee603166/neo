@@ -18,7 +18,7 @@ def call_llm(
         "messages": [m.to_dict() for m in messages],
     }
     if system:
-        kwargs["system"] = system
+        kwargs["system"] = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
     if tools:
         kwargs["tools"] = [t.to_dict() for t in tools]
 
@@ -37,7 +37,7 @@ async def call_llm_async(
         "messages": [m.to_dict() for m in messages],
     }
     if system:
-        kwargs["system"] = system
+        kwargs["system"] = [{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}]
     if tools:
         kwargs["tools"] = [t.to_dict() for t in tools]
 

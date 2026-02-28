@@ -6,9 +6,18 @@ Provides live terminal UI to watch the tree mechanics in real-time.
 import os
 import asyncio
 from rich.live import Live
-from rich.tree import Tree
+from rich.tree import Tree as RichTree
 from rich.console import Console
 from rich.text import Text
+
+
+class Tree(RichTree):
+    """Rich Tree with curved corners on last-child connectors (╰── instead of └──)."""
+    TREE_GUIDES = [
+        ("    ", "│   ", "├── ", "╰── "),
+        ("    ", "┃   ", "┣━━ ", "┗━━ "),
+        ("    ", "║   ", "╠══ ", "╚══ "),
+    ]
 
 from sauce.neo import Neo
 from sauce.tree import DecompositionTree

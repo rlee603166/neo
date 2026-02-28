@@ -3,8 +3,12 @@ Main entry point for Neo with live visualization.
 Run with: uv run python main.py
 """
 import asyncio
+import signal
+import sys
 
 from sauce import DecompositionTree, Neo, run_with_live_visualization
+
+STATE_PATH = "dashboard/backend/state/tree.json"
 
 async def main():
 
@@ -13,30 +17,36 @@ async def main():
     tree = DecompositionTree()
     neo = Neo(tree, max_concurrent_tasks=10, env_directory=env_dir)
 
-    # task = "What is the time complexity of merge sort, and why?"
-    # Define the task
-    task = """Build a Python algorithms library as a package at ./algorithms/.
-    Implement and test the following categories, each in its own module:
+    def handle_sigint(sig, frame):
+        print("\nInterrupted — saving tree state...")
+        if tree.root is not None:
+            tree.dump_state(STATE_PATH)
+            print(f"Tree state saved to {STATE_PATH}")
+        sys.exit(0)
 
-    1. Sorting: bubble sort, merge sort, quick sort, heap sort, radix sort
-    2. Searching: binary search, BFS, DFS, A*
-    3. Graph algorithms: Dijkstra's shortest path, topological sort, detect cycles, find connected components
-    4. Data structures: linked list, stack, queue, min-heap, hash map (open addressing)
+    signal.signal(signal.SIGINT, handle_sigint)
 
-    Each implementation must have a corresponding test file that verifies correctness.
-    Finally, produce a README.md documenting the public API for each module.
-    """
+    task = input("What do you want to build? ").strip()
+    if not task:
+        print("No task provided. Exiting.")
+        return
 
-    # Run with live visualization
-    await run_with_live_visualization(
-        neo=neo,
-        task=task,
-        title="Neo Decomposition Tree - Live",
-        refresh_rate=4
-    )
+    try:
+        await run_with_live_visualization(
+            neo=neo,
+            task=task,
+            title="Neo Decomposition Tree - Live",
+            refresh_rate=4
+        )
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        print("\nInterrupted — saving tree state...")
+        if tree.root is not None:
+            tree.dump_state(STATE_PATH)
+            print(f"Tree state saved to {STATE_PATH}")
+        return
 
     print(tree.root.conversation.messages[-1].content[0]['text'])
-    tree.dump_state(f"{env_dir}/state/tree.json")
+    tree.dump_state(STATE_PATH)
 
 
 if __name__ == "__main__":

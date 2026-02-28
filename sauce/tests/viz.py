@@ -27,7 +27,7 @@ async def mock_call_llm_async(
 
     # Determine what kind of response to return based on the system prompt
     if "recursive reasoning agent" in system:  # THINKING node
-        return _mock_thinking_response()
+        return _mock_thinking_response(messages)
     elif "code implementation agent" in system:  # CODE node
         return _mock_code_response(messages)
     elif "code verification agent" in system:  # TEST node
@@ -45,8 +45,20 @@ async def mock_call_llm_async(
     )
 
 
-def _mock_thinking_response() -> AgentResponse:
-    """THINKING node spawns sub-agents."""
+def _mock_thinking_response(messages: list) -> AgentResponse:
+    """THINKING node spawns sub-agents on first call, then completes."""
+    already_spawned = any(
+        isinstance(m.content, list) and any(b.get("type") == "tool_result" for b in m.content)
+        for m in messages if m.role == "user"
+    )
+    if already_spawned:
+        return AgentResponse(
+            text="<MESSAGE>All sub-tasks complete.</MESSAGE>",
+            tool_calls=[],
+            stop_reason="end_turn",
+            input_tokens=100,
+            output_tokens=50,
+        )
     return AgentResponse(
         text="I'll break this down into sub-problems.",
         tool_calls=[
@@ -185,19 +197,12 @@ async def main():
     # Patch the LLM call
     with patch('sauce.llm.call_llm_async', new=mock_call_llm_async):
 
-        # console.print("\n[bold cyan]═══ Test 1: Simple Scenario ═══[/bold cyan]\n")
-        # console.print("THINKING node spawns 3 children (CODE + TEST + CODE)")
-        # console.print("Each child makes sequential tool calls\n")
-        # tree1 = DecompositionTree()
-        # neo1 = Neo(tree1)
-        # await run_with_live_visualization(neo1, SIMPLE_TASK, "Simple: THINKING → 3 children")
-        # await asyncio.sleep(2)
-
-        console.print("\n[bold cyan]═══ Test 2: Tool-Heavy Scenario ═══[/bold cyan]\n")
-        console.print("CODE node making sequential tool calls without subagents\n")
-        tree2 = DecompositionTree()
-        neo2 = Neo(tree2)
-        await run_with_live_visualization(neo2, TOOL_HEAVY_TASK, "Tool-Heavy: Sequential tool calls")
+        console.print("\n[bold cyan]═══ Test 1: Simple Scenario ═══[/bold cyan]\n")
+        console.print("THINKING node spawns 3 children (CODE + TEST + CODE)")
+        console.print("Each child makes sequential tool calls\n")
+        tree1 = DecompositionTree()
+        neo1 = Neo(tree1)
+        await run_with_live_visualization(neo1, SIMPLE_TASK, "Simple: THINKING → 3 children")
         await asyncio.sleep(2)
 
         console.print("\n[bold green]✓ All scenarios complete![/bold green]\n")
